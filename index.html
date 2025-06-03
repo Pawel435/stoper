@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stoper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .greeting {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ff6b6b;
+            font-weight: bold;
+            height: 2rem;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        .display {
+            font-size: 2.5rem;
+            margin: 1rem 0;
+            font-family: monospace;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #startBtn { background: #4CAF50; color: white; }
+        #stopBtn { background: #f44336; color: white; }
+        #resetBtn { background: #ff9800; color: white; }
+        #lapBtn { background: #2196F3; color: white; }
+        .laps { margin-top: 1rem; text-align: left; }
+        .lap-item { padding: 0.5rem; border-bottom: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="greeting" id="greeting"></div>
+    <div class="container">
+        <h1>Stoper</h1>
+        <div class="display" id="display">00:00:00</div>
+        <div class="buttons">
+            <button id="startBtn">Start</button>
+            <button id="stopBtn">Stop</button>
+            <button id="resetBtn">Reset</button>
+            <button id="lapBtn">Zapisz czas</button>
+        </div>
+        <div class="laps" id="laps"></div>
+    </div>
+
+    <script>
+        // Zmienne
+        let startTime;
+        let elapsedTime = 0;
+        let timerInterval;
+        let isRunning = false;
+
+        // Elementy DOM
+        const display = document.getElementById('display');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const lapBtn = document.getElementById('lapBtn');
+        const lapsContainer = document.getElementById('laps');
+        const greeting = document.getElementById('greeting');
+
+        // Formatowanie czasu (MM:SS:MS)
+        function formatTime(ms) {
+            const date = new Date(ms);
+            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+            const milliseconds = Math.floor(date.getUTCMilliseconds() / 10).toString().padStart(2, '0');
+            return `${minutes}:${seconds}:${milliseconds}`;
+        }
+
+        // Aktualizacja wyświetlacza
+        function updateDisplay() {
+            display.textContent = formatTime(elapsedTime);
+        }
+
+        // Start stopera
+        function startTimer() {
+            if (!isRunning) {
+                greeting.textContent = "Miłego dnia Kochanie :)";
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 10);
+                isRunning = true;
+            }
+        }
+
+        // Zatrzymanie stopera
+        function stopTimer() {
+            if (isRunning) {
+                greeting.textContent = "Mika czeka na ciebie";
+                clearInterval(timerInterval);
+                isRunning = false;
+            }
+        }
+
+        // Reset stopera
+        function resetTimer() {
+            stopTimer();
+            elapsedTime = 0;
+            updateDisplay();
+            lapsContainer.innerHTML = '';
+        }
+
+        // Zapisywanie okrążenia
+        function saveLap() {
+            if (elapsedTime > 0) {
+                const lapItem = document.createElement('div');
+                lapItem.className = 'lap-item';
+                lapItem.textContent = formatTime(elapsedTime);
+                lapsContainer.prepend(lapItem);
+            }
+        }
+
+        // Nasłuchiwanie przycisków
+        startBtn.addEventListener('click', startTimer);
+        stopBtn.addEventListener('click', stopTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        lapBtn.addEventListener('click', saveLap);
+
+        // Inicjalizacja
+        updateDisplay();
+    </script>
+</body>
+</html>
